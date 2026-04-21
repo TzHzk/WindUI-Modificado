@@ -40,9 +40,6 @@ function Button.New(Title, Icon, Callback, Variant, Parent, Dialog, FullRounded,
 		}),
 
 		Creator.NewRoundFrame(Radius, "Squircle", {
-			-- ThemeTag = {
-			--     ImageColor3 = "Layer",
-			-- },
 			ImageColor3 = Color3.new(1, 1, 1),
 			Size = UDim2.new(1, 0, 1, 0),
 			Name = "Special",
@@ -50,41 +47,32 @@ function Button.New(Title, Icon, Callback, Variant, Parent, Dialog, FullRounded,
 		}),
 
 		Creator.NewRoundFrame(Radius, "Shadow-sm", {
-			-- ThemeTag = {
-			--     ImageColor3 = "Layer",
-			-- },
 			ImageColor3 = Color3.new(0, 0, 0),
 			Size = UDim2.new(1, 3, 1, 3),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			Name = "Shadow",
-			--ImageTransparency = Variant == "Secondary" and 0 or 1,
 			ImageTransparency = 1,
 			Visible = not FullRounded,
 		}),
 
+		-- ═══════════════════════════════════════════════════════════
+		-- AQUÍ ESTÁ EL UIStroke AGREGADO (DENTRO DEL MISMO BLOQUE)
+		-- ═══════════════════════════════════════════════════════════
 		Creator.NewRoundFrame(Radius, not FullRounded and "Glass-1" or "Glass-0.7", {
 			ThemeTag = {
 				ImageColor3 = "White",
 			},
 			Size = UDim2.new(1, 0, 1, 0),
-			--ImageColor3 = Variant == "White" and Color3.new(0,0,0) or nil,
 			ImageTransparency = 0.6,
 			Name = "Outline",
 		}, {
-			-- New("UIGradient", {
-			--     Rotation = 70,
-			--     Color = ColorSequence.new({
-			--         ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 255)),
-			--         ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
-			--         ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 255)),
-			--     }),
-			--     Transparency = NumberSequence.new({
-			--         NumberSequenceKeypoint.new(0.0, 0.1),
-			--         NumberSequenceKeypoint.new(0.5, 1),
-			--         NumberSequenceKeypoint.new(1.0, 0.1),
-			--     })
-			-- })
+			New("UIStroke", {
+				Color = Color3.fromRGB(255, 255, 255),
+				Transparency = 0.5,
+				Thickness = 1,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			})
 		}),
 
 		Creator.NewRoundFrame(Radius, "Squircle", {
@@ -94,7 +82,7 @@ function Button.New(Title, Icon, Callback, Variant, Parent, Dialog, FullRounded,
 				ImageColor3 = Variant ~= "White" and "Text" or nil,
 			},
 			ImageColor3 = Variant == "White" and Color3.new(0, 0, 0) or nil,
-			ImageTransparency = 1, -- .95
+			ImageTransparency = 1,
 		}, {
 			New("UIPadding", {
 				PaddingLeft = UDim.new(0, 16),
@@ -130,7 +118,7 @@ function Button.New(Title, Icon, Callback, Variant, Parent, Dialog, FullRounded,
 		Tween(ButtonFrame.Frame, 0.047, { ImageTransparency = 1 }):Play()
 	end)
 	Creator.AddSignal(ButtonFrame.MouseButton1Up, function()
-		if Dialog then --idk
+		if Dialog then
 			Dialog:Close()()
 		end
 		if Callback then
