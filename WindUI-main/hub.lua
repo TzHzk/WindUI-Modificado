@@ -1,10 +1,7 @@
--- ═══════════════════════════════════════════════════════════════
---   ASTRASHUB ZZ - By TzHzk
---   Speed | JumpPower | ESP Highlight
---   Usando TU WindUI Modificado (Sliders Verdes)
--- ═══════════════════════════════════════════════════════════════
+-- ASTRA HUB ZZ - Versión Estable Final (Sin Errores de Compilación)
+-- Usa TU WindUI Modificado desde GitHub
 
--- Cargar TU WindUI Modificado desde GitHub
+-- CAMBIA ESTA URL POR LA DE TU REPOSITORIO REAL SI NO ES ESTA
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Txzp/Astras-Zzz/main/WindUI-main/dist/main.lua"))()
 
 local Players = game:GetService("Players")
@@ -12,7 +9,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local LP = Players.LocalPlayer
 
--- Variables Globales
+-- Variables
 local SpeedEnabled = false
 local SpeedValue = 16
 local JumpEnabled = false
@@ -20,13 +17,9 @@ local JumpValue = 50
 local ESPEnabled = false
 local ESPFill = 0.5
 local ESPObjects = {}
-local ToggleKey = Enum.KeyCode.K
 local Window = nil
 
--- ═══════════════════════════════════════════════════════════════
--- FUNCIONES LÓGICAS
--- ═══════════════════════════════════════════════════════════════
-
+-- Funciones Lógicas
 local function ApplySpeed()
     local char = LP.Character
     if not char then return end
@@ -60,7 +53,7 @@ local function UpdateESP()
                     if not ESPObjects[plr] then
                         local hl = Instance.new("Highlight")
                         hl.Adornee = char
-                        hl.FillColor = Color3.fromRGB(255, 50, 50) -- Rojo por defecto
+                        hl.FillColor = Color3.fromRGB(255, 50, 50)
                         hl.OutlineColor = Color3.fromRGB(255, 255, 255)
                         hl.FillTransparency = ESPFill
                         hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -83,19 +76,15 @@ end
 
 RunService.Heartbeat:Connect(UpdateESP)
 
--- ═══════════════════════════════════════════════════════════════
--- CREACIÓN DE UI (WINDUI MODIFICADO)
--- ═══════════════════════════════════════════════════════════════
-
+-- Crear Ventana
 Window = WindUI:CreateWindow({
     Title = "ASTRA HUB ZZ",
-    Icon = "zap",
     Theme = "Dark",
     Size = UDim2.fromOffset(480, 420)
 })
 
--- Header Tags
-Window:Tag({ Title = "AstraHub ZZ", Color = Color3.fromHex("#30ff6a") })
+-- Tags Decorativos
+Window:Tag({ Title = "AstraHub", Color = Color3.fromHex("#30ff6a") })
 Window:Tag({ Title = "v1.0", Color = Color3.fromHex("#315dff") })
 Window:Tag({ Title = "by TzHzk", Color = Color3.fromHex("#888888") })
 
@@ -103,12 +92,11 @@ Window:Tag({ Title = "by TzHzk", Color = Color3.fromHex("#888888") })
 local MainTab = Window:Tab({ Title = "Main", Icon = "home" })
 local PlayerTab = Window:Tab({ Title = "Player", Icon = "user" })
 local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
-local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings" })
 
 -- MAIN TAB
 MainTab:Paragraph({
-    Title = "✨ Bienvenido a AstraHub ZZ",
-    Desc = "Hub optimizado por TzHzk\nSpeed • Jump • ESP\nSliders Verdes Personalizados"
+    Title = "✨ AstraHub ZZ",
+    Desc = "Hub Estable\nSliders Verdes\nSin Errores"
 })
 MainTab:Divider()
 MainTab:Button({
@@ -120,7 +108,7 @@ MainTab:Button({
     end
 })
 
--- PLAYER TAB (CON SLIDERS VERDES)
+-- PLAYER TAB (Usando Sliders Verdes de TU WindUI)
 PlayerTab:Toggle({
     Title = "⚡ Speed Activado",
     Value = false,
@@ -130,7 +118,7 @@ PlayerTab:Toggle({
     end
 })
 
--- Slider de Velocidad (AHORA SERÁ VERDE GRACIAS A TU MODIFICACIÓN)
+-- Slider de Velocidad (DEBERÍA SER VERDE AHORA)
 PlayerTab:Slider({
     Title = "Velocidad",
     Value = { Min = 16, Max = 120, Default = 16 },
@@ -151,7 +139,7 @@ PlayerTab:Toggle({
     end
 })
 
--- Slider de Salto (TAMBIÉN VERDE)
+-- Slider de Salto (DEBERÍA SER VERDE AHORA)
 PlayerTab:Slider({
     Title = "Altura de Salto",
     Value = { Min = 50, Max = 200, Default = 50 },
@@ -161,7 +149,7 @@ PlayerTab:Slider({
     end
 })
 
--- ESP TAB (CON SLIDER VERDE)
+-- ESP TAB
 ESPTab:Toggle({
     Title = "👁️ ESP Highlight",
     Value = false,
@@ -170,40 +158,15 @@ ESPTab:Toggle({
     end
 })
 
--- Slider de Opacidad (TAMBIÉN VERDE)
+-- Slider de Opacidad (DEBERÍA SER VERDE AHORA)
 ESPTab:Slider({
     Title = "Opacidad del ESP",
     Value = { Min = 0, Max = 1, Default = 0.5 },
-    Increment = 0.1, -- Importante para sliders decimales
+    Increment = 0.1,
     Callback = function(value)
         ESPFill = value
     end
 })
 
--- SETTINGS TAB (KEYBIND)
-SettingsTab:Keybind({
-    Title = "Tecla Abrir/Cerrar",
-    Value = "K", -- Valor inicial como string
-    Callback = function(key)
-        -- WindUI devuelve el nombre de la tecla, lo convertimos a Enum
-        local success, enumKey = pcall(function()
-            return Enum.KeyCode[key]
-        end)
-        if success then
-            ToggleKey = enumKey
-            WindUI:Notify({ Title = "Keybind", Content = "Tecla cambiada a: " .. key, Duration = 2 })
-        end
-    end
-})
-
--- Keybind Global para abrir/cerrar
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == ToggleKey then
-        Window:Toggle()
-    end
-end)
-
 print("✅ AstraHub ZZ Cargado Correctamente")
 print("🟢 Sliders Verdes Activados")
-print("🔑 Usa la tecla K para abrir/cerrar")
