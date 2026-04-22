@@ -6877,9 +6877,8 @@ ae.NewRoundFrame(99,"Squircle",{
 Name="Frame",
 Size=UDim2.new(ar,0,1,0),
 ImageTransparency=.1,
-ThemeTag={
-ImageColor3="Slider",
-},
+-- CAMBIO AQUÍ: Eliminamos ThemeTag y ponemos ImageColor3 directo
+ImageColor3=Color3.fromRGB(0,255,106),
 },{
 ae.NewRoundFrame(99,"Squircle",{
 Size=UDim2.new(0,ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),0,ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)),
