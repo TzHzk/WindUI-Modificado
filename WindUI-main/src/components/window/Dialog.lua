@@ -75,7 +75,6 @@ function DialogModule.Create(Key, Type, Window, WindUI, Parent)
 		}),
 	})
 
-	-- FONDO DEL DIALOG MODIFICADO (Oscuro con borde verde sutil)
 	Dialog.UIElements.MainContainer = Creator.NewRoundFrame(Dialog.UICorner, "Squircle", {
 		Visible = false,
 		ImageTransparency = Key and 0.15 or 0,
@@ -83,23 +82,16 @@ function DialogModule.Create(Key, Type, Window, WindUI, Parent)
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		AutomaticSize = "XY",
-		ImageColor3 = Color3.fromRGB(15, 15, 20), -- Fondo casi negro
+		ThemeTag = {
+			ImageColor3 = Type .. "Background",
+			ImageTransparency = Type .. "BackgroundTransparency",
+		},
 		ZIndex = 9999,
 	}, {
 		Creator.NewRoundFrame(Dialog.UICorner, "Glass-1", {
 		    ImageTransparency = 0.89,
-		    Size = UDim2.new(1,0,1,0),
-		    ImageColor3 = Color3.fromRGB(48, 255, 106), -- Tinte verde muy sutil
+		    Size = UDim2.new(1,0,1,0)
 		}),
-		
-		-- Borde Verde Sutil
-		Creator.NewRoundFrame(Dialog.UICorner, "SquircleOutline", {
-			Size = UDim2.new(1,0,1,0),
-			ImageColor3 = Color3.fromRGB(48, 255, 106),
-			ImageTransparency = 0.8,
-			ZIndex = 10000,
-		}),
-
 		Dialog.UIElements.Main,
 	})
 
