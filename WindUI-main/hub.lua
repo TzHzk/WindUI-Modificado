@@ -2,11 +2,12 @@
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Txzp/Astras-Zzz/main/WindUI-main/dist/main.lua"))()
 
 -- Crear la ventana CON la configuración KeySystem integrada
+-- NOTA: El Hub NO se creará visualmente hasta que la clave sea correcta.
 local Window = WindUI:CreateWindow({
     Title = "ASTRA HUB ZZ",
     Theme = "Dark",
     Size = UDim2.fromOffset(480, 420),
-    Folder = "AstraHubZZ", -- Importante para guardar la clave
+    Folder = "AstraHubZZ", -- Importante: Carpeta donde se guarda la clave
     
     -- CONFIGURACIÓN DEL KEYSYSTEM NATIVO
     KeySystem = {
@@ -14,11 +15,12 @@ local Window = WindUI:CreateWindow({
         Note = "Introduce tu clave para acceder a AstraHub ZZ.", -- Texto de ayuda
         Key = "Testing 2", -- <--- TU CLAVE AQUÍ
         SaveKey = true,    -- Guarda la clave para no pedirla la próxima vez
+        -- Icon = "key",   -- Opcional: Icono de la ventana de clave
     }
 })
 
 -- Si el código llega aquí, significa que la clave YA fue verificada y es correcta.
--- El script se detuvo arriba hasta que introdujiste la clave correcta.
+-- El script se detuvo arriba (en CreateWindow) hasta que introdujiste la clave correcta.
 
 print("✅ Clave correcta. Cargando interfaz...")
 
@@ -50,4 +52,4 @@ MainTab:Toggle({
     end
 })
 
-print(" Hub cargado completamente.")
+print("✅ Hub cargado completamente.")
