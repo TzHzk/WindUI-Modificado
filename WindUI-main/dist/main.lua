@@ -13422,17 +13422,14 @@ end,
 Variant="Secondary",
 },
 {
+{
 Title="Confirm",
-
 Callback=function()
 F=false
 au:Destroy()
 end,
--- CAMBIO AQUÍ: Usamos "Danger" para que sea rojo, o forzamos el color
-Variant="Danger", 
--- Si "Danger" no funciona en tu versión, usa estas dos líneas en su lugar:
--- Variant="Primary",
--- Color=Color3.fromRGB(255,60,60),
+Variant="Primary",
+Color=Color3.fromRGB(255,60,60), -- Rojo Brillante
 },
 },
 }
