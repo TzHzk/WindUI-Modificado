@@ -1,16 +1,16 @@
 -- ============================================================================
--- SCRIPT: WindUI Hub - Silent Aim + FOV + ESP + Hitbox con Team Check
+-- SCRIPT: WindUI Hub - Silent Aim + FOV + ESP + Hitbox (VERSIÓN SEGURA)
 -- AUTOR: Asistente IA para Yanso
 -- FECHA: 2026
--- DESCRIPCIÓN: Integra Silent Aim con FOV dinámico, ESP con Team Check automático,
---              y configuración de Hitbox. Usa WindUI como interfaz.
+-- DESCRIPCIÓN: Versión corregida que evita errores de "Vector3 and nil".
+--              Usa FOV visual y detección de objetivos sin modificar Mouse.Hit/Target
+--              hasta que se identifique el RemoteEvent correcto.
 -- ============================================================================
 
 -- 1. CARGAR WINDUI
 local WindUILoaded = false
 if not game:IsLoaded() then game.Loaded:Wait() end
 
--- Cargar WindUI desde GitHub
 local function LoadWindUI()
     local Success, Result = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Txzp/Astras-Zzz/main/WindUI-main/dist/main.lua"))()
@@ -24,7 +24,7 @@ local function LoadWindUI()
 end
 
 LoadWindUI()
-if not WindUILoaded then return end -- Detener si no cargó
+if not WindUILoaded then return end
 
 -- 2. CONFIGURACIÓN GLOBAL Y SERVICIOS
 local Players = game:GetService("Players")
@@ -41,10 +41,10 @@ local Config = {
         Enabled = false,
         FOV_Enabled = true,
         FOV_Radius = 150,
-        FOV_Color_Inactive = Color3.fromRGB(255, 0, 0), -- Rojo cuando no hay objetivo
-        FOV_Color_Active = Color3.fromRGB(0, 255, 0),   -- Verde cuando hay objetivo
-        Keybind = Enum.KeyCode.E, -- Tecla para activar/desactivar Aimbot
-        SilentAim_Keybind = Enum.KeyCode.Q -- Tecla alternativa para silent aim rápido
+        FOV_Color_Inactive = Color3.fromRGB(255, 0, 0),
+        FOV_Color_Active = Color3.fromRGB(0, 255, 0),
+        Keybind = Enum.KeyCode.E,
+        SilentAim_Keybind = Enum.KeyCode.Q
     },
     ESP = {
         Enabled = false,
@@ -65,8 +65,8 @@ local Config = {
 -- 3. VARIABLES DE ESTADO Y OBJETIVOS
 local ClosestTarget = nil
 local FOV_Circle = Drawing.new("Circle")
-local ESP_Table = {} -- Guarda los objetos de dibujo de ESP
-local TeamSystemDetected = false -- Para Team Check automático
+local ESP_Table = {}
+local TeamSystemDetected = false
 
 -- 4. INICIALIZACIÓN DEL FOV
 FOV_Circle.Visible = false
@@ -78,16 +78,13 @@ FOV_Circle.Filled = false
 
 -- 5. FUNCIONES DE UTILIDAD
 
--- Detectar sistema de equipos automáticamente
 local function DetectTeamSystem()
-    -- Verificar si usa Teams estándar
     if LocalPlayer.Team and #game.Teams:GetChildren() > 0 then
         TeamSystemDetected = "Standard"
         print("[TeamCheck] Sistema estándar de Teams detectado.")
         return true
     end
     
-    -- Buscar en ReplicatedStorage posibles tablas de equipos
     for _, Child in ipairs(ReplicatedStorage:GetChildren()) do
         if Child:IsA("Folder") or Child:IsA("Model") then
             if string.lower(Child.Name):find("team") or string.lower(Child.Name):find("match") then
@@ -102,7 +99,6 @@ local function DetectTeamSystem()
     return false
 end
 
--- Verificar si un jugador es enemigo válido
 local function IsValidTarget(Player)
     if not Player or Player == LocalPlayer then return false end
     if not Player.Character then return false end
@@ -110,15 +106,12 @@ local function IsValidTarget(Player)
     if not Humanoid or Humanoid.Health <= 0 then return false end
     if not Player.Character:FindFirstChild("HumanoidRootPart") then return false end
 
-    -- Team Check
     if Config.ESP.Check_Teams then
         if TeamSystemDetected == "Standard" then
             if LocalPlayer.Team and Player.Team and LocalPlayer.Team == Player.Team then
-                return false -- Es aliado
+                return false
             end
         elseif TeamSystemDetected == "Custom" then
-            -- Aquí podrías agregar lógica específica si encuentras cómo se definen los equipos personalizados
-            -- Por ahora, asumimos que si tiene equipo, es aliado
             if LocalPlayer:FindFirstChild("Team") and Player:FindFirstChild("Team") then
                 if LocalPlayer.Team.Value == Player.Team.Value then
                     return false
@@ -130,17 +123,14 @@ local function IsValidTarget(Player)
     return true
 end
 
--- Obtener parte del cuerpo para apuntar (Hitbox)
 local function GetHitboxPart(Character)
     local Part = Character:FindFirstChild(Config.Hitbox.Invisible and "HumanoidRootPart" or "Head")
     return Part or Character:FindFirstChild("HumanoidRootPart")
 end
 
--- 6. LÓGICA DE AIMBOT Y FOV
+-- 6. LÓGICA DE AIMBOT Y FOV (SEGURA - SIN MODIFICAR MOUSE.HIT/TARGET)
 
--- Actualizar posición del FOV y buscar objetivo
 RunService.Heartbeat:Connect(function()
-    -- Mover FOV al centro de la pantalla
     FOV_Circle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     FOV_Circle.Radius = Config.Aimbot.FOV_Radius
     FOV_Circle.Visible = Config.Aimbot.Enabled and Config.Aimbot.FOV_Enabled
@@ -176,47 +166,33 @@ RunService.Heartbeat:Connect(function()
 
     ClosestTarget = NewTarget
 
-    -- Cambiar color del FOV según si hay objetivo
     if ClosestTarget then
-        FOV_Circle.Color = Config.Aimbot.FOV_Color_Active -- Verde
+        FOV_Circle.Color = Config.Aimbot.FOV_Color_Active
     else
-        FOV_Circle.Color = Config.Aimbot.FOV_Color_Inactive -- Rojo
+        FOV_Circle.Color = Config.Aimbot.FOV_Color_Inactive
     end
 end)
 
--- Silent Aim: Redirigir Mouse.Target y Mouse.Hit cuando se hace clic
-Mouse.Button1Down:Connect(function()
-    if Config.Aimbot.Enabled and ClosestTarget then
-        local Character = ClosestTarget.Character
-        if Character then
-            local Part = GetHitboxPart(Character)
-            if Part then
-                -- Redirigir el mouse hacia la parte del enemigo
-                -- Esto engaña a muchos juegos que usan Mouse.Target para disparar
-                Mouse.Target = Part
-                Mouse.Hit = Part.CFrame
-                
-                -- Opcional: Forzar disparo si el juego usa RemoteEvent
-                -- Descomenta esto si sabes el nombre del RemoteEvent y sus argumentos
-                /*
-                local ShootRemote = ReplicatedStorage.Remotes:FindFirstChild("ClientGunShot")
-                if ShootRemote then
-                    ShootRemote:FireServer(Part.Position, Part)
-                end
-                */
-                
-                print("[SilentAim] Disparo redirigido a: " .. ClosestTarget.Name)
-            end
-        end
-    end
-end)
+-- ⚠️ DESACTIVADO TEMPORALMENTE PARA EVITAR ERRORES
+-- Mouse.Button1Down:Connect(function()
+--     if Config.Aimbot.Enabled and ClosestTarget then
+--         local Character = ClosestTarget.Character
+--         if Character then
+--             local Part = GetHitboxPart(Character)
+--             if Part then
+--                 -- NO modificamos Mouse.Target ni Mouse.Hit aquí para evitar errores
+--                 print("[SilentAim] Objetivo detectado: " .. ClosestTarget.Name .. " (Redirección desactivada por seguridad)")
+--             end
+--         end
+--     end
+-- end)
 
--- 7. LÓGICA DE ESP
+-- 7. LÓGICA DE ESP (IGUAL QUE ANTES)
 
 local function CreateESP(Player)
     if not Config.ESP.Enabled then return end
     if not IsValidTarget(Player) then return end
-    if ESP_Table[Player] then return end -- Evitar duplicados
+    if ESP_Table[Player] then return end
 
     local Box = Drawing.new("Square")
     Box.Color = Config.ESP.Color
@@ -234,7 +210,6 @@ local function CreateESP(Player)
 
     ESP_Table[Player] = { Box = Box, NameTag = NameTag }
 
-    -- Actualizar ESP en cada frame
     local Connection
     Connection = RunService.RenderStepped:Connect(function()
         if not Config.ESP.Enabled or not IsValidTarget(Player) then
@@ -249,7 +224,6 @@ local function CreateESP(Player)
             local Pos, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
             
             if OnScreen then
-                -- Calcular tamaño de la caja basado en la distancia
                 local Height = (Camera:WorldToViewportPoint((RootPart.CFrame * CFrame.new(0, 2.5, 0)).Position).Y - 
                                 Camera:WorldToViewportPoint((RootPart.CFrame * CFrame.new(0, -2.5, 0)).Position).Y)
                 local Width = Height * 0.75
@@ -270,7 +244,6 @@ local function CreateESP(Player)
         end
     end)
 
-    -- Limpiar ESP cuando el jugador sale
     Player.AncestryChanged:Connect(function()
         if Connection then Connection:Disconnect() end
         if Box then Box:Remove() end
@@ -279,9 +252,7 @@ local function CreateESP(Player)
     end)
 end
 
--- Conectar ESP a nuevos jugadores
 Players.PlayerAdded:Connect(CreateESP)
--- Crear ESP para jugadores ya existentes
 for _, Player in ipairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
         CreateESP(Player)
@@ -289,37 +260,32 @@ for _, Player in ipairs(Players:GetPlayers()) do
 end
 
 -- 8. LÓGICA DE HITBOX (SIMULADA)
--- Nota: Modificar hitboxes reales requiere hooks avanzados. Aquí simulamos la detección.
+
 local function UpdateHitbox()
     if Config.Hitbox.Enabled then
         print("[Hitbox] Hitbox activada. Tamaño: " .. Config.Hitbox.Size)
-        -- Aquí podrías agregar lógica para modificar el tamaño de las partes si el juego lo permite
     else
         print("[Hitbox] Hitbox desactivada.")
     end
 end
 
--- 9. CREACIÓN DE LA INTERFAZ WINDUI
+-- 9. CREACIÓN DE LA INTERFAZ WINDUI (IGUAL QUE ANTES)
 
--- Crear ventana principal
 local Window = WindUI.CreateWindow({
     Title = "WindUI Hub - By Yanso",
-    SubTitle = "v1.0 | Silent Aim + ESP + Hitbox",
-    Theme = "Dark" -- O "Light", "Blue", etc.
+    SubTitle = "v1.1 | Safe Mode - No Mouse Modification",
+    Theme = "Dark"
 })
 
--- Pestaña 1: AIMBOT
 local AimbotTab = Window.CreateTab({
     Title = "Aimbot",
-    Icon = "aim" -- Icono opcional
+    Icon = "aim"
 })
 
--- Bienvenida
 AimbotTab.CreateLabel({
-    Text = "Bienvenido, " .. LocalPlayer.Name .. "! Usa el Aimbot con precaución."
+    Text = "Bienvenido, " .. LocalPlayer.Name .. "! Modo seguro activo."
 })
 
--- Toggle Silent Aim
 AimbotTab.CreateToggle({
     Title = "Activar Silent Aim",
     Description = "Activa el apuntado automático dentro del FOV.",
@@ -330,7 +296,6 @@ AimbotTab.CreateToggle({
     end
 })
 
--- Keybind para Silent Aim
 AimbotTab.CreateKeybind({
     Title = "Keybind Silent Aim",
     Description = "Presiona esta tecla para activar/desactivar el Aimbot.",
@@ -340,7 +305,6 @@ AimbotTab.CreateKeybind({
         print("[Aimbot] Keybind cambiada a: " .. Key.Name)
     end,
     ChangedCallback = function(Key)
-        -- Alternar estado al presionar la tecla
         UserInputService.InputBegan:Connect(function(Input, GameProcessed)
             if not GameProcessed and Input.KeyCode == Key then
                 Config.Aimbot.Enabled = not Config.Aimbot.Enabled
@@ -350,7 +314,6 @@ AimbotTab.CreateKeybind({
     end
 })
 
--- Toggle Mostrar FOV
 AimbotTab.CreateToggle({
     Title = "Mostrar Círculo FOV",
     Description = "Muestra u oculta el círculo de campo de visión.",
@@ -361,7 +324,6 @@ AimbotTab.CreateToggle({
     end
 })
 
--- Slider Tamaño FOV
 AimbotTab.CreateSlider({
     Title = "Tamaño del FOV",
     Description = "Ajusta el radio del círculo de apuntado.",
@@ -375,25 +337,21 @@ AimbotTab.CreateSlider({
     end
 })
 
--- Pestaña 2: ESP & HITBOX
 local ESPHitboxTab = Window.CreateTab({
     Title = "ESP & Hitbox",
     Icon = "eye"
 })
 
--- Sección ESP
 ESPHitboxTab.CreateLabel({
     Text = "--- ESP (Wallhack) ---"
 })
 
--- Toggle ESP
 ESPHitboxTab.CreateToggle({
     Title = "Activar ESP",
     Description = "Muestra cajas y nombres de los enemigos.",
     Default = false,
     Callback = function(Value)
         Config.ESP.Enabled = Value
-        -- Actualizar visibilidad de todos los ESPs existentes
         for _, Data in pairs(ESP_Table) do
             Data.Box.Visible = Value and Config.ESP.Show_Box
             Data.NameTag.Visible = Value and Config.ESP.Show_Name
@@ -402,7 +360,6 @@ ESPHitboxTab.CreateToggle({
     end
 })
 
--- Keybind ESP
 ESPHitboxTab.CreateKeybind({
     Title = "Keybind ESP",
     Description = "Presiona esta tecla para activar/desactivar el ESP.",
@@ -416,7 +373,6 @@ ESPHitboxTab.CreateKeybind({
             if not GameProcessed and Input.KeyCode == Key then
                 Config.ESP.Enabled = not Config.ESP.Enabled
                 print("[ESP] ESP alternado a: " .. (Config.ESP.Enabled and "ON" or "OFF"))
-                -- Actualizar visibilidad
                 for _, Data in pairs(ESP_Table) do
                     Data.Box.Visible = Config.ESP.Enabled and Config.ESP.Show_Box
                     Data.NameTag.Visible = Config.ESP.Enabled and Config.ESP.Show_Name
@@ -426,7 +382,6 @@ ESPHitboxTab.CreateKeybind({
     end
 })
 
--- Toggle Team Check
 ESPHitboxTab.CreateToggle({
     Title = "Team Check Automático",
     Description = "Evita mostrar ESP en aliados. Detecta sistema de equipos automáticamente.",
@@ -434,18 +389,16 @@ ESPHitboxTab.CreateToggle({
     Callback = function(Value)
         Config.ESP.Check_Teams = Value
         if Value then
-            DetectTeamSystem() -- Re-detectar al activar
+            DetectTeamSystem()
         end
         print("[ESP] Team Check: " .. (Value and "ON" or "OFF"))
     end
 })
 
--- Sección Hitbox
 ESPHitboxTab.CreateLabel({
     Text = "--- Hitbox Configuration ---"
 })
 
--- Toggle Hitbox
 ESPHitboxTab.CreateToggle({
     Title = "Activar Hitbox Expandida",
     Description = "Simula una hitbox más grande para facilitar impactos.",
@@ -456,7 +409,6 @@ ESPHitboxTab.CreateToggle({
     end
 })
 
--- Keybind Hitbox
 ESPHitboxTab.CreateKeybind({
     Title = "Keybind Hitbox",
     Description = "Presiona esta tecla para activar/desactivar la Hitbox.",
@@ -475,7 +427,6 @@ ESPHitboxTab.CreateKeybind({
     end
 })
 
--- Slider Tamaño Hitbox
 ESPHitboxTab.CreateSlider({
     Title = "Tamaño de Hitbox",
     Description = "Ajusta el tamaño de la hitbox (simulado).",
@@ -489,7 +440,6 @@ ESPHitboxTab.CreateSlider({
     end
 })
 
--- Toggle Hitbox Invisible
 ESPHitboxTab.CreateToggle({
     Title = "Hitbox Invisible",
     Description = "Usa HumanoidRootPart en lugar de Head para apuntar.",
@@ -501,5 +451,5 @@ ESPHitboxTab.CreateToggle({
 })
 
 -- 10. INICIALIZACIÓN FINAL
-print("[WindUI Hub] Script cargado completamente.")
-DetectTeamSystem() -- Detectar equipos al inicio
+print("[WindUI Hub] Script cargado completamente en modo seguro.")
+DetectTeamSystem()
