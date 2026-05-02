@@ -1,31 +1,24 @@
--- ASTRA HUB ZZ - Script Principal
+-- ASTRA HUB ZZ - Script Principal (Sin KeySystem)
 -- Carga TU WindUI Modificado desde GitHub
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Txzp/Astras-Zzz/main/WindUI-main/dist/main.lua"))()
 
 print("🔄 Iniciando AstraHub Zz...")
 
 -- ═══════════════════════════════════════════════════════════════
--- CONFIGURACIÓN DE LA VENTANA Y KEYSYSTEM
+-- CONFIGURACIÓN DE LA VENTANA (SIN KEYSYSTEM)
 -- ═══════════════════════════════════════════════════════════════
 local Window = WindUI:CreateWindow({
     Title = "ASTRA HUB ZZ",
     Theme = "Dark",
     Size = UDim2.fromOffset(480, 420),
     Folder = "AstraHubZZ",
-    IgnoreAlerts = true, -- Importante para usar nuestro Dialog personalizado
-    
-    KeySystem = {
-        Title = "Verificación de Licencia",
-        Note = "Introduce tu clave para acceder.",
-        Key = "Testing 2", -- <--- TU CLAVE AQUÍ
-        SaveKey = true,    -- Guarda la clave para no pedirla siempre
-    }
+    IgnoreAlerts = true, -- Importante: Usa nuestro Dialog personalizado al cerrar
 })
 
-print("✅ Clave correcta. Cargando interfaz...")
+print("✅ Ventana cargada. Interfaz lista.")
 
 -- ═══════════════════════════════════════════════════════════════
--- TAB PRINCIPAL (Usamos Secciones para organizar)
+-- TAB PRINCIPAL (Usamos Secciones para organizar todo aquí)
 -- ═══════════════════════════════════════════════════════════════
 local MainTab = Window:Tab({ Title = "Main", Icon = "home" })
 
@@ -33,7 +26,7 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "home" })
 local WelcomeSection = MainTab:Section({
     Title = "Bienvenido",
     Description = "Estado del sistema",
-    Collapsed = false
+    Collapsed = false -- Empieza abierta
 })
 
 WelcomeSection:Paragraph({
@@ -41,10 +34,10 @@ WelcomeSection:Paragraph({
     Desc = "Sistema cargado correctamente.\nModificaciones activas: Sliders Verdes, Dialog Rojo."
 })
 
--- Sección 2: Prueba de Sliders (DEBEN SER VERDES)
+-- Sección 2: Prueba de Sliders (DEBEN SER VERDES por tu modificación en main.lua)
 local SliderSection = MainTab:Section({
     Title = "Prueba de Sliders",
-    Description = "Verifica el color verde",
+    Description = "Verifica el color verde neón",
     Collapsed = false
 })
 
@@ -52,6 +45,7 @@ SliderSection:Slider({
     Title = "Velocidad (Verde)",
     Value = { Min = 16, Max = 120, Default = 50 },
     Callback = function(v) 
+        -- Lógica de velocidad aquí si quieres
         print("Speed:", v)
     end
 })
@@ -65,11 +59,11 @@ SliderSection:Slider({
     end
 })
 
--- Sección 3: Controles Variados
+-- Sección 3: Controles Variados (Toggles, Botones, Dropdowns)
 local ControlSection = MainTab:Section({
     Title = "Controles",
-    Description = "Botones y Toggles",
-    Collapsed = true
+    Description = "Botones, Toggles y Menús",
+    Collapsed = true -- Empieza cerrada
 })
 
 ControlSection:Toggle({
@@ -109,7 +103,7 @@ local InfoSection = MainTab:Section({
 
 InfoSection:Paragraph({
     Title = "Modificaciones Activas",
-    Desc = "✅ Slider Verde\n✅ Dialog Personalizado (Rojo)\n✅ KeySystem Integrado"
+    Desc = "✅ Slider Verde Neón\n✅ Dialog de Cierre Personalizado (Rojo)\n✅ Diseño Minimalista"
 })
 
 InfoSection:Button({
