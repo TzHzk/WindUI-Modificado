@@ -6870,22 +6870,22 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 Name="Frame",
 ThemeTag={
-ImageColor3="Text", -- Esto es el fondo oscuro, déjalo así o pon un gris oscuro
+ImageColor3="Text", 
 },
 },{
 ae.NewRoundFrame(99,"Squircle",{
-Name="Frame", -- Esta es la BARRA de progreso
+Name="Frame", 
 Size=UDim2.new(ar,0,1,0),
 ImageTransparency=.1,
--- CAMBIO AQUÍ: Forzamos el color VERDE directamente, sin ThemeTag
+
 ImageColor3=Color3.fromRGB(0,255,106), 
 },{
 ae.NewRoundFrame(99,"Squircle",{
 Size=UDim2.new(0,ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),0,ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)),
 Position=UDim2.new(1,0,0.5,0),
 AnchorPoint=Vector2.new(0.5,0.5),
--- CAMBIO AQUÍ: Forzamos la BOLITA (Thumb) a VERDE también
-ImageColor3=Color3.fromRGB(0,255,106), 
+
+ImageColor3=Color3.fromRGB(255,255,255), 
 Name="Thumb",
 },{
 ae.NewRoundFrame(99,"Glass-1",{
