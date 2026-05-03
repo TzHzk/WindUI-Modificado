@@ -1,38 +1,38 @@
--- ASTRA HUB ZZ - Intro Visual Limpia (Sin Fondo Negro)
+-- ASTRA HUB ZZ - Intro Visual Final (Sin Fondo, Rápida, Subtítulo Bajo)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
 -- ═══════════════════════════════════════════════════════════════
--- 1. INTRO VISUAL LIMPIA (Solo Texto Flotante)
+-- 1. INTRO VISUAL FINAL (Transparente + Rápida + Ajustada)
 -- ═══════════════════════════════════════════════════════════════
 
 -- Crear Pantalla de Carga
 local IntroGui = Instance.new("ScreenGui")
-IntroGui.Name = "AstraIntroClean"
+IntroGui.Name = "AstraIntroFinal"
 IntroGui.Parent = game.CoreGui
 IntroGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- NOTA: No creamos un Frame de fondo negro. Solo el texto.
+-- NOTA: No creamos ningún Frame de fondo. Solo los textos.
 
 -- Texto Principal (Grande y Elegante)
 local IntroText = Instance.new("TextLabel")
-IntroText.Size = UDim2.new(0, 700, 0, 120) -- Más grande
-IntroText.Position = UDim2.new(0.5, -350, 0.5, -60)
-IntroText.BackgroundTransparency = 1
+IntroText.Size = UDim2.new(0, 700, 0, 120) -- Grande
+IntroText.Position = UDim2.new(0.5, -350, 0.5, -60) -- Centrado
+IntroText.BackgroundTransparency = 1 -- Sin fondo
 IntroText.Text = "ASTRAS HUB ZZ"
 IntroText.TextColor3 = Color3.fromRGB(255, 255, 255)
 IntroText.TextSize = 90 -- Muy grande
 IntroText.Font = Enum.Font.GothamBold
-IntroText.TextStrokeTransparency = 0.6 -- Borde suave para leerse bien en cualquier fondo
+IntroText.TextStrokeTransparency = 0.6 -- Borde suave para leerse bien
 IntroText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 IntroText.Parent = IntroGui
 
--- Subtítulo Pequeño
+-- Subtítulo Pequeño (Más Abajo)
 local SubText = Instance.new("TextLabel")
 SubText.Size = UDim2.new(0, 300, 0, 30)
-SubText.Position = UDim2.new(0.5, -150, 0.5, 30)
-SubText.BackgroundTransparency = 1
+SubText.Position = UDim2.new(0.5, -150, 0.5, 50) -- <--- CAMBIO: Bajado a Y=50 (antes era 30)
+SubText.BackgroundTransparency = 1 -- Sin fondo
 SubText.Text = "by Tz-hzk | v1.0"
 SubText.TextColor3 = Color3.fromRGB(220, 220, 220)
 SubText.TextSize = 26
@@ -51,8 +51,8 @@ task.spawn(function()
     UIScale.Scale = 0.5
     UIScale.Parent = IntroText
     
-    -- 2. RETRASO FORZADO DE 0.6 SEGUNDOS ANTES DE EMPEZAR
-    task.wait(0.6)
+    -- 2. RETRASO FORZADO DE 0.1 SEGUNDOS (Muy rápido)
+    task.wait(0.1)
 
     -- 3. Animación de Entrada (Zoom-In Suave)
     local TweenInfoIn = TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
@@ -66,7 +66,7 @@ task.spawn(function()
     TweenService:Create(SubText, TweenInfoIn, { TextTransparency = 0.2 }):Play()
 
     -- 4. Tiempo de Lectura (Mantener visible)
-    task.wait(1.5) -- Se queda visible 1.5 segundos
+    task.wait(1.2) -- Se queda visible 1.2 segundos
 
     -- 5. Animación de Salida (Desvanecimiento Rápido)
     local TweenInfoOut = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
