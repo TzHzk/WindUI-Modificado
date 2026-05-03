@@ -1,105 +1,82 @@
--- ASTRA HUB ZZ - Intro Visual Mejorada
+-- ASTRA HUB ZZ - Intro Visual Limpia (Sin Fondo Negro)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
 -- ═══════════════════════════════════════════════════════════════
--- 1. INTRO VISUAL MEJORADA (Animaciones Suaves + Texto Grande)
+-- 1. INTRO VISUAL LIMPIA (Solo Texto Flotante)
 -- ═══════════════════════════════════════════════════════════════
 
 -- Crear Pantalla de Carga
 local IntroGui = Instance.new("ScreenGui")
-IntroGui.Name = "AstraIntroV2"
+IntroGui.Name = "AstraIntroClean"
 IntroGui.Parent = game.CoreGui
 IntroGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Fondo Semitransparente (No negro sólido, sino oscuro con transparencia)
-local IntroFrame = Instance.new("Frame")
-IntroFrame.Size = UDim2.new(1, 0, 1, 0)
-IntroFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-IntroFrame.BackgroundTransparency = 0.4 -- <--- CAMBIO: No es negro sólido, es semitransparente
-IntroFrame.BorderSizePixel = 0
-IntroFrame.Parent = IntroGui
+-- NOTA: No creamos un Frame de fondo negro. Solo el texto.
 
--- Texto Principal (Más Grande y con Efecto)
+-- Texto Principal (Grande y Elegante)
 local IntroText = Instance.new("TextLabel")
-IntroText.Size = UDim2.new(0, 600, 0, 100) -- <--- CAMBIO: Más grande
-IntroText.Position = UDim2.new(0.5, -300, 0.5, -50)
+IntroText.Size = UDim2.new(0, 700, 0, 120) -- Más grande
+IntroText.Position = UDim2.new(0.5, -350, 0.5, -60)
 IntroText.BackgroundTransparency = 1
 IntroText.Text = "ASTRAS HUB ZZ"
 IntroText.TextColor3 = Color3.fromRGB(255, 255, 255)
-IntroText.TextSize = 80 -- <--- CAMBIO: Tamaño de fuente mucho mayor
+IntroText.TextSize = 90 -- Muy grande
 IntroText.Font = Enum.Font.GothamBold
-IntroText.TextStrokeTransparency = 0.5 -- Borde suave
+IntroText.TextStrokeTransparency = 0.6 -- Borde suave para leerse bien en cualquier fondo
 IntroText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-IntroText.Parent = IntroFrame
+IntroText.Parent = IntroGui
 
--- Subtítulo Opcional (Para darle más estilo)
+-- Subtítulo Pequeño
 local SubText = Instance.new("TextLabel")
 SubText.Size = UDim2.new(0, 300, 0, 30)
-SubText.Position = UDim2.new(0.5, -150, 0.5, 20) -- Debajo del título principal
+SubText.Position = UDim2.new(0.5, -150, 0.5, 30)
 SubText.BackgroundTransparency = 1
 SubText.Text = "by Tz-hzk | v1.0"
-SubText.TextColor3 = Color3.fromRGB(200, 200, 200)
-SubText.TextSize = 24
+SubText.TextColor3 = Color3.fromRGB(220, 220, 220)
+SubText.TextSize = 26
 SubText.Font = Enum.Font.GothamMedium
-SubText.TextTransparency = 1 -- Empieza invisible
-SubText.Parent = IntroFrame
+SubText.TextStrokeTransparency = 0.8
+SubText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+SubText.Parent = IntroGui
 
--- Animación de Entrada (Zoom-In + Fade-In)
+-- Animación Controlada
 task.spawn(function()
-    -- 1. Estado Inicial: Escala pequeña y transparente
+    -- 1. Estado Inicial: Invisible y pequeño
     IntroText.TextTransparency = 1
+    SubText.TextTransparency = 1
     
     local UIScale = Instance.new("UIScale")
-    UIScale.Scale = 0.5 -- Empieza pequeño
+    UIScale.Scale = 0.5
     UIScale.Parent = IntroText
     
-    SubText.TextTransparency = 1
+    -- 2. RETRASO FORZADO DE 0.6 SEGUNDOS ANTES DE EMPEZAR
+    task.wait(0.6)
 
-    task.wait(0.2)
-
-    -- 2. Animación de Aparición (Zoom-In Suave)
+    -- 3. Animación de Entrada (Zoom-In Suave)
     local TweenInfoIn = TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
     
-    -- Animar Texto Principal
-    local GoalText = { TextTransparency = 0 }
-    local TweenText = TweenService:Create(IntroText, TweenInfoIn, GoalText)
-    TweenText:Play()
+    -- Aparecer Texto Principal
+    TweenService:Create(IntroText, TweenInfoIn, { TextTransparency = 0 }):Play()
+    TweenService:Create(UIScale, TweenInfoIn, { Scale = 1.1 }):Play()
     
-    -- Animar Escala (Zoom)
-    local GoalScale = { Scale = 1.1 } -- Llega a 1.1 para luego ajustar
-    local TweenScale = TweenService:Create(UIScale, TweenInfoIn, GoalScale)
-    TweenScale:Play()
+    -- Aparecer Subtítulo con un poco de retraso
+    task.wait(0.1)
+    TweenService:Create(SubText, TweenInfoIn, { TextTransparency = 0.2 }):Play()
 
-    -- Animar Subtítulo
-    local GoalSub = { TextTransparency = 0.3 }
-    local TweenSub = TweenService:Create(SubText, TweenInfoIn, GoalSub)
-    TweenSub:Play()
+    -- 4. Tiempo de Lectura (Mantener visible)
+    task.wait(1.5) -- Se queda visible 1.5 segundos
 
-    -- Esperar mientras se lee el texto
-    task.wait(2.0)
-
-    -- 3. Animación de Salida (Fade-Out + Zoom-Out)
-    local TweenInfoOut = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    -- 5. Animación de Salida (Desvanecimiento Rápido)
+    local TweenInfoOut = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     
-    -- Desvanecer Texto
-    local GoalTextOut = { TextTransparency = 1 }
-    local TweenTextOut = TweenService:Create(IntroText, TweenInfoOut, GoalTextOut)
-    TweenTextOut:Play()
-    
-    -- Desvanecer Subtítulo
-    local GoalSubOut = { TextTransparency = 1 }
-    local TweenSubOut = TweenService:Create(SubText, TweenInfoOut, GoalSubOut)
-    TweenSubOut:Play()
+    TweenService:Create(IntroText, TweenInfoOut, { TextTransparency = 1 }):Play()
+    TweenService:Create(SubText, TweenInfoOut, { TextTransparency = 1 }):Play()
+    TweenService:Create(UIScale, TweenInfoOut, { Scale = 1.5 }):Play() -- Se agranda al desaparecer
 
-    -- Desvanecer Fondo
-    local GoalBg = { BackgroundTransparency = 1 }
-    local TweenBg = TweenService:Create(IntroFrame, TweenInfoOut, GoalBg)
-    TweenBg:Play()
-
-    -- Destruir GUI después de la animación
-    task.wait(0.7)
+    -- 6. Destruir GUI
+    task.wait(0.6)
     IntroGui:Destroy()
 end)
 
@@ -107,8 +84,8 @@ end)
 -- 2. CARGAR WINDUI Y CREAR EL HUB
 -- ═══════════════════════════════════════════════════════════════
 
--- Pequeña pausa para asegurar que la intro se vea bien antes de cargar la librería
-task.wait(0.5)
+-- Pequeña pausa extra para asegurar estabilidad visual
+task.wait(0.2)
 
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Txzp/Astras-Zzz/main/WindUI-main/dist/main.lua"))()
 
