@@ -1,52 +1,106 @@
--- ASTRA HUB ZZ - Con Intro Visual
+-- ASTRA HUB ZZ - Intro Visual Mejorada
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
 -- ═══════════════════════════════════════════════════════════════
--- 1. INTRO VISUAL (Aparece antes del Hub)
+-- 1. INTRO VISUAL MEJORADA (Animaciones Suaves + Texto Grande)
 -- ═══════════════════════════════════════════════════════════════
 
 -- Crear Pantalla de Carga
 local IntroGui = Instance.new("ScreenGui")
-IntroGui.Name = "AstraIntro"
+IntroGui.Name = "AstraIntroV2"
 IntroGui.Parent = game.CoreGui
 IntroGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+-- Fondo Semitransparente (No negro sólido, sino oscuro con transparencia)
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Size = UDim2.new(1, 0, 1, 0)
-IntroFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Fondo Negro
+IntroFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IntroFrame.BackgroundTransparency = 0.4 -- <--- CAMBIO: No es negro sólido, es semitransparente
 IntroFrame.BorderSizePixel = 0
 IntroFrame.Parent = IntroGui
 
+-- Texto Principal (Más Grande y con Efecto)
 local IntroText = Instance.new("TextLabel")
-IntroText.Size = UDim2.new(0, 300, 0, 50)
-IntroText.Position = UDim2.new(0.5, -150, 0.5, -25)
+IntroText.Size = UDim2.new(0, 600, 0, 100) -- <--- CAMBIO: Más grande
+IntroText.Position = UDim2.new(0.5, -300, 0.5, -50)
 IntroText.BackgroundTransparency = 1
 IntroText.Text = "ASTRAS HUB ZZ"
 IntroText.TextColor3 = Color3.fromRGB(255, 255, 255)
-IntroText.TextSize = 40
+IntroText.TextSize = 80 -- <--- CAMBIO: Tamaño de fuente mucho mayor
 IntroText.Font = Enum.Font.GothamBold
+IntroText.TextStrokeTransparency = 0.5 -- Borde suave
+IntroText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 IntroText.Parent = IntroFrame
 
--- Animación de Desvanecimiento (Fade Out)
+-- Subtítulo Opcional (Para darle más estilo)
+local SubText = Instance.new("TextLabel")
+SubText.Size = UDim2.new(0, 300, 0, 30)
+SubText.Position = UDim2.new(0.5, -150, 0.5, 20) -- Debajo del título principal
+SubText.BackgroundTransparency = 1
+SubText.Text = "by Tz-hzk | v1.0"
+SubText.TextColor3 = Color3.fromRGB(200, 200, 200)
+SubText.TextSize = 24
+SubText.Font = Enum.Font.GothamMedium
+SubText.TextTransparency = 1 -- Empieza invisible
+SubText.Parent = IntroFrame
+
+-- Animación de Entrada (Zoom-In + Fade-In)
 task.spawn(function()
-    task.wait(2.5) -- Tiempo que dura la intro visible
+    -- 1. Estado Inicial: Escala pequeña y transparente
+    IntroText.TextTransparency = 1
+    IntroText.Scale = Vector2.new(0.5, 0.5) -- No existe propiedad Scale directa en TextLabel, usaremos UIScale
     
-    -- Desvanecer Texto
-    local TweenInfoText = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local GoalText = { TextTransparency = 1 }
-    local TweenText = TweenService:Create(IntroText, TweenInfoText, GoalText)
+    local UIScale = Instance.new("UIScale")
+    UIScale.Scale = 0.5 -- Empieza pequeño
+    UIScale.Parent = IntroText
+    
+    SubText.TextTransparency = 1
+
+    task.wait(0.2)
+
+    -- 2. Animación de Aparición (Zoom-In Suave)
+    local TweenInfoIn = TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    
+    -- Animar Texto Principal
+    local GoalText = { TextTransparency = 0 }
+    local TweenText = TweenService:Create(IntroText, TweenInfoIn, GoalText)
     TweenText:Play()
     
-    -- Desvanecer Fondo
-    local TweenInfoBg = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local GoalBg = { BackgroundTransparency = 1 }
-    local TweenBg = TweenService:Create(IntroFrame, TweenInfoBg, GoalBg)
-    TweenBg:Play()
+    -- Animar Escala (Zoom)
+    local GoalScale = { Scale = 1.1 } -- Llega a 1.1 para luego ajustar
+    local TweenScale = TweenService:Create(UIScale, TweenInfoIn, GoalScale)
+    TweenScale:Play()
+
+    -- Animar Subtítulo
+    local GoalSub = { TextTransparency = 0.3 }
+    local TweenSub = TweenService:Create(SubText, TweenInfoIn, GoalSub)
+    TweenSub:Play()
+
+    -- Esperar mientras se lee el texto
+    task.wait(2.0)
+
+    -- 3. Animación de Salida (Fade-Out + Zoom-Out)
+    local TweenInfoOut = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     
+    -- Desvanecer Texto
+    local GoalTextOut = { TextTransparency = 1 }
+    local TweenTextOut = TweenService:Create(IntroText, TweenInfoOut, GoalTextOut)
+    TweenTextOut:Play()
+    
+    -- Desvanecer Subtítulo
+    local GoalSubOut = { TextTransparency = 1 }
+    local TweenSubOut = TweenService:Create(SubText, TweenInfoOut, GoalSubOut)
+    TweenSubOut:Play()
+
+    -- Desvanecer Fondo
+    local GoalBg = { BackgroundTransparency = 1 }
+    local TweenBg = TweenService:Create(IntroFrame, TweenInfoOut, GoalBg)
+    TweenBg:Play()
+
     -- Destruir GUI después de la animación
-    task.wait(0.6)
+    task.wait(0.7)
     IntroGui:Destroy()
 end)
 
